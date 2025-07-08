@@ -1,4 +1,5 @@
-Flask
-groq
-APScheduler
+flask
 python-dotenv
+groq
+langgraph
+langchain
