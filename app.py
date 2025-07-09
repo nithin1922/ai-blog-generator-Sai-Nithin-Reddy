@@ -1,11 +1,12 @@
 import os
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
+load_dotenv(dotenv_path=".env")
+
+from groq import Groq
 from seo_fetcher import get_metrics
 from ai_generator import generate_post_with_agent
-
-# Load environment
-load_dotenv()
+from judgeval.tracer import Tracer
 
 app = Flask(__name__)
 

@@ -1,14 +1,24 @@
 import os
 from groq import Groq
 from dotenv import load_dotenv
+load_dotenv(dotenv_path=".env")
 from seo_fetcher import get_metrics
 from langgraph.graph import StateGraph, END
 from langgraph.prebuilt.tool_node import ToolNode
 from typing import TypedDict, Optional
-load_dotenv()
+# Judgeval imports
+from judgeval.tracer import Tracer
+from judgeval.common.tracer import Tracer as CommonTracer  # For handler
+from judgeval.integrations.langgraph import JudgevalCallbackHandler
 
-# Initialize Groq client using the GROQ_API_KEY environment variable
+
+
+# Initialize Groq client using the GROQ_API_KEY environment variable (no wrap)
 client = Groq(api_key=os.getenv('GROQ_API_KEY'))
+# Initialize Judgeval tracer
+judgment = Tracer(project_name="ai_blog_generator")
+# Initialize JudgevalCallbackHandler for LangGraph
+handler = JudgevalCallbackHandler(judgment)
 
 def blog_post_prompt(keyword: str, seo: dict) -> str:
     return (
@@ -82,8 +92,10 @@ def generate_post_with_agent(keyword: str):
     graph.add_edge("write_markdown", END)
     graph.set_entry_point("fetch_seo")
 
-    # Run the agent
+    # Run the agent with Judgeval callback handler
     state = {"keyword": keyword}
     compiled_graph = graph.compile()
-    result = compiled_graph.invoke(state)
+    config_with_callbacks = {"callbacks": [handler]}
+    result = compiled_graph.invoke(state, config=config_with_callbacks)
     return result["post"], result["seo"], result["filepath"]
+
