@@ -69,4 +69,4 @@ GET /generate?keyword=wireless earbuds
 - The generated markdown files are saved as `daily_<keyword>.md` in the project root.
 
 ## License
-MIT (or specify your license) 
+MIT
